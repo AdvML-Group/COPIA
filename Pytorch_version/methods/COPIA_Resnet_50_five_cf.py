@@ -1,0 +1,280 @@
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import random
+import numpy as np
+
+from .method_base import BaseAttack
+
+seed = 2013
+torch.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+random.seed(seed)
+np.random.seed(seed)
+
+class COPIA_Resnet_50_five_cf(BaseAttack):
+    def __init__(self, model_name, target=False, epsilon=16 / 255,
+                 steps=10, decay=1.0, ens=30,
+                 layer_idx=[0, 1, 2, 3, 4],
+                 scale=0.2, lr=0.025):
+        super().__init__('DANAA_CF_RESNET', model_name, target, epsilon, steps, decay)
+        self.step_size = (epsilon / steps) * 1.2
+        self.ens = ens
+        self.layer_idx = layer_idx
+        self.scale = scale
+        self.lr = lr
+        self.lam = 10.0
+
+        if hasattr(self.model, "aux_logits"):
+            self.model.aux_logits = False
+
+        for module in self.model.modules():
+            if isinstance(module, nn.ReLU):
+                module.inplace = False
+
+    def _get_bounds(self, device):
+        mean = torch.tensor([0.485, 0.456, 0.406], device=device).view(1, 3, 1, 1)
+        std = torch.tensor([0.229, 0.224, 0.225], device=device).view(1, 3, 1, 1)
+
+        lower_bound = (0.0 - mean) / std
+        upper_bound = (1.0 - mean) / std
+
+        eps_norm = self.epsilon / std
+        step_size_norm = self.step_size / std
+
+        return lower_bound, upper_bound, eps_norm, step_size_norm
+
+    def _get_std_tensor(self, device):
+        mean = torch.tensor(
+            [0.485, 0.456, 0.406],
+            device=device
+        ).view(1, 3, 1, 1)
+
+        std = torch.tensor(
+            [0.229, 0.224, 0.225],
+            device=device
+        ).view(1, 3, 1, 1)
+
+        return mean, std
+
+    def _get_target_layer(self):
+        m = self.model.model if hasattr(self.model, "model") else self.model
+        model_type = type(m).__name__.lower()
+
+        if "resnet" in model_type:
+            is_resnet152 = len(m.layer3) > 10
+            if is_resnet152:
+                layers = [m.relu, m.layer1[-1], m.layer2[2], m.layer2[-1], m.layer3[4]]
+            else:
+                layers = [m.relu, m.layer1[-1], m.layer2[1], m.layer2[-1], m.layer3[1]]
+        else:
+            layers = [m.Conv2d_2b_3x3, m.Conv2d_4a_3x3, m.Mixed_5b, m.Mixed_5d, m.Mixed_6a]
+
+        return [layers[i] for i in self.layer_idx]
+
+    def _get_layer_activation(self, x):
+        layers = self._get_target_layer()
+        feats = {}
+        hooks = []
+
+        def hook_fn(i):
+            def hook(module, inp, out):
+                feats[i] = out
+
+            return hook
+
+        for i, l in enumerate(layers):
+            hooks.append(l.register_forward_hook(hook_fn(i)))
+        try:
+            _ = self.model(x)
+            return [feats[i].detach() for i in range(len(layers))]
+        finally:
+            for h in hooks: h.remove()
+
+    def _compute_danaa_attribution(self, inps, cf_inps, labels):
+        self.model.eval()
+        layers = self._get_target_layer()
+        num_layers = len(layers)
+
+        lower_bound, upper_bound, _, _ = self._get_bounds(inps.device)
+
+        cf_logits = []
+        with torch.no_grad():
+            for j in range(5):
+                o = self.model(cf_inps[:, j])
+                if isinstance(o, tuple): o = o[0]
+                cf_logits.append(o.detach())
+
+        agg = [0 for _ in range(num_layers)]
+        x_up = [inps.clone().detach().requires_grad_(True) for _ in range(5)]
+        x_down = [inps.clone().detach().requires_grad_(True) for _ in range(5)]
+
+        mse = nn.MSELoss()
+        ce = nn.CrossEntropyLoss()
+
+        for _ in range(self.ens):
+            for j in range(5):
+                feats_up = {}
+                hooks_up = []
+
+                def get_hook_up(i):
+                    def hook(m, inp, out):
+                        feats_up[i] = out
+                        if out.requires_grad: out.retain_grad()
+
+                    return hook
+
+                for i, l in enumerate(layers):
+                    hooks_up.append(l.register_forward_hook(get_hook_up(i)))
+
+                noisy_up = (x_up[j] + torch.randn_like(x_up[j]) * self.scale)
+
+                noisy_up = torch.max(torch.min(noisy_up, upper_bound), lower_bound).requires_grad_(True)
+
+                out_up = self.model(noisy_up)
+                if isinstance(out_up, tuple): out_up = out_up[0]
+
+                l_mse_up = mse(out_up, cf_logits[j])
+                l_ce_up = ce(out_up, labels)
+
+                g_in_up = torch.autograd.grad(l_mse_up, noisy_up, retain_graph=True)[0]
+
+                next_x_up = x_up[j] + self.lr * g_in_up.sign()
+
+                x_up[j] = torch.max(torch.min(next_x_up, upper_bound), lower_bound).detach().requires_grad_(True)
+
+                g_feat_up = torch.autograd.grad(l_ce_up, [feats_up[i] for i in range(num_layers)], allow_unused=True)
+                for h in hooks_up: h.remove()
+
+                feats_down = {}
+                hooks_down = []
+
+                def get_hook_down(i):
+                    def hook(m, inp, out):
+                        feats_down[i] = out
+                        if out.requires_grad: out.retain_grad()
+
+                    return hook
+
+                for i, l in enumerate(layers):
+                    hooks_down.append(l.register_forward_hook(get_hook_down(i)))
+
+                noisy_down = (x_down[j] + torch.randn_like(x_down[j]) * self.scale)
+
+                noisy_down = torch.max(torch.min(noisy_down, upper_bound), lower_bound).requires_grad_(True)
+
+                out_down = self.model(noisy_down)
+                if isinstance(out_down, tuple): out_down = out_down[0]
+
+                l_mse_down = mse(out_down, cf_logits[j])
+                l_ce_down = ce(out_down, labels)
+
+                g_in_down = torch.autograd.grad(l_mse_down, noisy_down, retain_graph=True)[0]
+
+                next_x_down = x_down[j] - self.lr * g_in_down.sign()
+
+                x_down[j] = torch.max(torch.min(next_x_down, upper_bound), lower_bound).detach().requires_grad_(True)
+
+                g_feat_down = torch.autograd.grad(l_ce_down, [feats_down[i] for i in range(num_layers)],
+                                                  allow_unused=True)
+                for h in hooks_down: h.remove()
+
+                for i in range(num_layers):
+                    gu = g_feat_up[i] if g_feat_up[i] is not None else torch.zeros_like(feats_up[i])
+                    gd = g_feat_down[i] if g_feat_down[i] is not None else torch.zeros_like(feats_down[i])
+                    if isinstance(agg[i], int):
+                        agg[i] = (gu + gd).detach()
+                    else:
+                        agg[i] += (gu + gd).detach()
+
+        for i in range(num_layers):
+            grad = agg[i] / (self.ens * 5.0)
+            norm = torch.norm(grad, p=2, dim=list(range(1, grad.ndim)), keepdim=True) + 1e-8
+            agg[i] = -grad / norm
+
+        base = [0 for _ in range(num_layers)]
+        for j in range(5):
+            fu = self._get_layer_activation(x_up[j])
+            fd = self._get_layer_activation(x_down[j])
+            for i in range(num_layers):
+                if isinstance(base[i], int):
+                    base[i] = (fu[i] + fd[i])
+                else:
+                    base[i] += (fu[i] + fd[i])
+        for i in range(num_layers): base[i] /= 10.0
+
+        return agg, base
+
+    def forward(self, inps, labels, cf_inps=None):
+        inps, labels, cf_inps = inps.cuda(), labels.cuda(), cf_inps.cuda()
+
+        lower_bound, upper_bound, eps_norm, step_size_norm = self._get_bounds(inps.device)
+
+        agg, base = self._compute_danaa_attribution(inps, cf_inps, labels)
+
+        momentum = torch.zeros_like(inps).cuda()
+        perts = torch.zeros_like(inps).cuda().requires_grad_(True)
+        layers = self._get_target_layer()
+        num_layers = len(layers)
+
+        for _ in range(self.steps):
+            feats_holder = {}
+            hooks = []
+
+            def hook_fn(i):
+                def hook(m, inp, out):
+                    feats_holder[i] = out
+                    if out.requires_grad: out.retain_grad()
+
+                return hook
+
+            for i, l in enumerate(layers):
+                hooks.append(l.register_forward_hook(hook_fn(i)))
+
+            adv = inps + perts
+            out = self.model(adv)
+            if isinstance(out, tuple): out = out[0]
+
+            step_agg_grad = [g.clone() for g in agg]
+            total_loss = 0
+
+            for i in range(num_layers - 1, 0, -1):
+                delta = feats_holder[i] - base[i]
+                if step_agg_grad[i].shape != delta.shape:
+                    step_agg_grad[i] = F.interpolate(step_agg_grad[i], size=delta.shape[-2:], mode='bilinear',
+                                                     align_corners=False)
+
+                loss_i = -torch.sum(delta * step_agg_grad[i])
+                total_loss += loss_i
+
+                mid_grad = torch.autograd.grad(loss_i, feats_holder[i - 1], retain_graph=True, allow_unused=True)[0]
+                if mid_grad is not None:
+                    if step_agg_grad[i - 1].shape != mid_grad.shape:
+                        mid_grad = F.interpolate(mid_grad, size=step_agg_grad[i - 1].shape[-2:], mode='bilinear',
+                                                 align_corners=False)
+                    norm = torch.norm(mid_grad, p=2, dim=list(range(1, mid_grad.ndim)), keepdim=True) + 1e-8
+                    mid_grad_normalized = mid_grad / norm
+                    step_agg_grad[i - 1] = step_agg_grad[i - 1] + 1.0 * mid_grad_normalized
+
+            delta_0 = feats_holder[0] - base[0]
+            if step_agg_grad[0].shape != delta_0.shape:
+                step_agg_grad[0] = F.interpolate(step_agg_grad[0], size=delta_0.shape[-2:], mode='bilinear',
+                                                 align_corners=False)
+            loss_0 = -torch.sum(delta_0 * step_agg_grad[0])
+            total_loss += loss_0
+
+            grad = torch.autograd.grad(total_loss, perts)[0]
+            for h in hooks: h.remove()
+
+            grad = grad / (torch.mean(torch.abs(grad), dim=(1, 2, 3), keepdim=True) + 1e-8)
+            grad = grad + momentum * self.decay
+            momentum = grad
+
+            perts.data = perts.data + step_size_norm * grad.sign()
+
+            perts.data = torch.max(torch.min(perts.data, eps_norm), -eps_norm)
+
+            adv_clamped = torch.max(torch.min(inps + perts.data, upper_bound), lower_bound)
+            perts.data = adv_clamped - inps
+
+        return (inps + perts).detach(), None
