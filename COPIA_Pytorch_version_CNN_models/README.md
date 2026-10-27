@@ -1,7 +1,7 @@
 #
 
-The official implementation of [**ACM MM 2026] "Counterfactual-Guided Diversified Path Integration for Transferable Neuron Attribution Attacks"**]. 
-
+The official implementation of [**ACM MM 2026**] "Counterfactual-Guided Diversified Path Integration for Transferable Neuron Attribution Attacks". 
+This is the implementation of our method COPIA in PyTorch, using a CNN model as the surrogate model.
 ## Introduction
 Transferable adversarial attacks pose significant security threats to
 neural networks due to their strong black-box effectiveness against
@@ -32,12 +32,16 @@ are available at https://github.com/AdvML-Group/COPIA.
 ## Dependencies
 
 - Python 3.6.13
-- Pytorch 1.7.1
+- Pytorch 1.10.2+cu113
 - Torchvision 0.8.2
 - Numpy 1.19.5
+- pandas 1.1.5 
 - Pillow 8.4.0
 - Timm 0.5.4
+- six 1.17.0
+- setuptools 58.0.4 
 - Scipy 1.5.4
+- tqdm 4.64.1 
 
 ## Usage Instructions
 
@@ -48,9 +52,15 @@ CNN models are all available in [timm](https://github.com/huggingface/pytorch-im
 The dataset can be downloaded from the link https://github.com/jpzhang1810/NAA, which is provided by NAA's authors, and all the image files should be placed in the directory `. /NAA_images`.
 
 To verify the transferability of adversarial examples, please use the verify.py script in the [NAA](https://github.com/jpzhang1810/NAA) code repository.
-##### 2. Source Code
 
-- `methods.py` : the code of the implementation for our proposed COPIA attack method.
+##### 2. Source Code
+- 'methods/COPIA_Inception_v3_one_cf.py':This is the code for our implementation of COPIA with Inception_v3 as the surrogate model with one counterfactual sample.
+- 'methods/COPIA_Inception_v3_five_cf.py':This is the code for our implementation of COPIA with Inception_v3 as the surrogate model with five counterfactual sample.
+- 'methods/COPIA_Inception_v4_five_cf.py':This is the code for our implementation of COPIA with Inception_v4 as the surrogate model with five counterfactual sample.
+- 'methods/COPIA_Inception_resnet_v2_five_cf.py':This is the code for our implementation of COPIA with Inception_resnet_v2 as the surrogate model with five counterfactual sample.
+- 'methods/COPIA_Resnet_50_five_cf.py':This is the code for our implementation of COPIA with Resnet_50 as the surrogate model with five counterfactual sample.
+- -'methods/COPIA_Resnet_152_five_cf.py':This is the code for our implementation of COPIA with Resnet_152 as the surrogate model with five counterfactual sample.
+
 
 ##### 3. Quickstart
 
@@ -67,6 +77,10 @@ bash run_copia_resnet_models.sh
 
 ```
 python COPIA_attack.py --attack COPIA_Inception_v3_five_cf --source_model inception_v3
+python COPIA_attack.py --attack COPIA_Inception_v4_five_cf --source_model inception_v4
+python COPIA_attack.py --attack COPIA_Inception_resnet_v2_five_cf --source_model inception_resnet_v2
+python COPIA_attack_resnet.py --attack COPIA_Resnet_50_five_cf --source_model resnet50
+python COPIA_attack_resnet.py --attack COPIA_Resnet_152_five_cf --source_model resnet152
 ```
 
 
