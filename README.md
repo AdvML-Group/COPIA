@@ -29,7 +29,7 @@ This repository contains the implementation code of COPIA in TensorFlow with a C
 
 ## Acknowledgments
 
-The code refer to: [NAA](https://github.com/jpzhang1810/NAA),[DANAA](https://github.com/Davidjinzb/DANAA),[MFAA](https://github.com/KWPCCC/MFAA)
+Code refer to: [NAA](https://github.com/jpzhang1810/NAA),[DANAA](https://github.com/Davidjinzb/DANAA), [MFAA](https://github.com/KWPCCC/MFAA), [IG2](https://github.com/JoeZhuo-ZY/IG2).
 
 We thanks the authors for sharing sincerely.
 
