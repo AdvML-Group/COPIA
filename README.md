@@ -1,6 +1,6 @@
 # 
 The official implementation of [**ACM MM 2026**] "Counterfactual-Guided Diversified Path Integration for Transferable Neuron Attribution Attacks". 
-This is the implementation of our method COPIA in PyTorch, using a CNN model as the surrogate model.
+
 ## Introduction
 Transferable adversarial attacks pose significant security threats to
 neural networks due to their strong black-box effectiveness against
