@@ -87,7 +87,7 @@ python COPIA_attack_resnet.py --attack COPIA_Resnet_152_five_cf --source_model r
 
 ## Acknowledgments
 
-The code refer to: [NAA](https://github.com/jpzhang1810/NAA),[DANAA](https://github.com/Davidjinzb/DANAA),[MFAA](https://github.com/KWPCCC/MFAA)
+Code refer to: [NAA](https://github.com/jpzhang1810/NAA),[DANAA](https://github.com/Davidjinzb/DANAA), [MFAA](https://github.com/KWPCCC/MFAA), [IG2](https://github.com/JoeZhuo-ZY/IG2).
 
 We thanks the authors for sharing sincerely.
 
