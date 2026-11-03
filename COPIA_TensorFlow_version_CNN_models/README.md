@@ -1,5 +1,3 @@
-# Implementation of COPIA: Counterfactual-Guided Diversified Path Integration Neuron Attribution Attack
-
 ## Prerequisites
 
 The implementation requires the following software and libraries:
@@ -79,5 +77,3 @@ python verify.py --ori_path ./dataset/images/ --adv_path ./COPIA_adv/inception_r
 The experiments were conducted on an RTX 3090 GPU with 24 GB of memory.
 
 
-## Refenece
-Code refer to: [NAA](https://github.com/jpzhang1810/NAA),[DANAA](https://github.com/Davidjinzb/DANAA), [MFAA](https://github.com/KWPCCC/MFAA), [IG2](https://github.com/JoeZhuo-ZY/IG2).
