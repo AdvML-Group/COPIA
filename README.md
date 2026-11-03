@@ -24,9 +24,13 @@ In addition, the proposed CA mechanism is highly generalizable and
 effectively improves the black-box transferability of existing single layer neuron attribution attacks. Code and supplementary materials
 are available at https://github.com/AdvML-Group/COPIA.
 
+## Framework
+<div align="center">
+    <img src="./Framework.png" width="90%">
+</div>
 
 
-# The contents of this repository
+## The contents of this repository
 This repository contains the implementation code of COPIA in TensorFlow with a CNN model as the surrogate model([COPIA_TensorFlow_version_CNN_models](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_TensorFlow_version_CNN_models/README.md)), the attack implementation code in PyTorch with CNN([COPIA_Pytorch_version_CNN_models](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Pytorch_version_CNN_models/README.md)) and ViT([COPIA_Pytorch_version_ViT_models](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Pytorch_version_ViT_models/readme.md)) models as surrogate models, and our supplementary material[supp](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Full.pdf).
 
 ## Acknowledgments
