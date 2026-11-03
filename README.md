@@ -42,10 +42,16 @@ We thanks the authors for sharing sincerely.
 ## Citation
 If you find this work is useful in your research, please cite our paper:
 ```
-Di Ming, Renqing Yang, Yuanchengzhi Liu, Peng Ren, Pengzhan Zhou,Yunlong Wang, and Xin Feng. 2026. Counterfactual-Guided Diversified Path Integration for Transferable Neuron Attribution Attacks. In Proceedings of the 34th ACM International Conference on Multimedia (MM ’26), November 10–14, 2026, Rio de Janeiro, Brazil. ACM, New York, NY, USA, 10 pages.
-https://doi.org/10.1145/3767308.3835442
-
+@InProceedings{ICML26_LRS_Attack,
+    author    = {Di Ming, Renqing Yang, Yuanchengzhi Liu, Peng Ren, Pengzhan Zhou,Yunlong Wang, and Xin Feng},
+    title     = {Counterfactual-Guided Diversified Path Integration for Transferable Neuron Attribution Attacks},
+    booktitle = {34th ACM International Conference on Multimedia (MM ’26)},
+    month     = {November},
+    year      = {2026},
+    pages     = {}
+}
 ```
+
 ## Contact
 [Di Ming](https://midasdming.github.io/): [diming@cqut.edu.cn](mailto:diming@cqut.edu.cn)
 
