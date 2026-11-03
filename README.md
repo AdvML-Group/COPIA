@@ -25,7 +25,7 @@ effectively improves the black-box transferability of existing single layer neur
 are available at https://github.com/AdvML-Group/COPIA.
 
 # The contents of this repository
-This repository contains the implementation code of COPIA in TensorFlow with a CNN model as the surrogate model, the attack implementation code in PyTorch with CNN and ViT models as surrogate models, and our supplementary material.
+This repository contains the implementation code of COPIA in TensorFlow with a CNN model as the surrogate model(COPIA_TensorFlow_version_CNN_models), the attack implementation code in PyTorch with CNN and ViT models as surrogate models, and our supplementary material.
 
 ## Acknowledgments
 
@@ -43,5 +43,6 @@ If you find this work is useful in your research, please cite our paper:
 Renqing Yang: [yrq2016@stu.cqut.edu.cn](mailto:yrq2016@stu.cqut.edu.cn)
 
 Yuanchengzhi Liu:[51240314102@stu.cqut.edu.cn](mailto:51240314102@stu.cqut.edu.cn)
+
 [Di Ming](https://midasdming.github.io/): [diming@cqut.edu.cn](mailto:diming@cqut.edu.cn)
 
