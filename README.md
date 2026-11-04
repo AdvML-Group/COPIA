@@ -35,10 +35,10 @@ are available at https://github.com/AdvML-Group/COPIA.
 
 ## The contents of this repository
 This repository contains:
--the implementation code of COPIA in TensorFlow with a CNN model as the surrogate model([COPIA_TensorFlow_version_CNN_models](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_TensorFlow_version_CNN_models/README.md))
-- the attack implementation code in PyTorch with CNN([COPIA_Pytorch_version_CNN_models](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Pytorch_version_CNN_models/README.md))
+- The implementation code of COPIA in TensorFlow with a CNN model as the surrogate model([COPIA_TensorFlow_version_CNN_models](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_TensorFlow_version_CNN_models/README.md))
+- The attack implementation code in PyTorch with CNN([COPIA_Pytorch_version_CNN_models](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Pytorch_version_CNN_models/README.md))
 - ViT([COPIA_Pytorch_version_ViT_models](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Pytorch_version_ViT_models/readme.md)) models as surrogate models
-- our supplementary material([supp](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Full.pdf)).
+- Supplementary material([supp](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Full.pdf)).
 
 ## Acknowledgments
 
