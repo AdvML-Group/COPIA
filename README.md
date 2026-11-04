@@ -1,5 +1,8 @@
-# 
+# COPIA
+
 The official implementation of [**ACM MM 2026**] "Counterfactual-Guided Diversified Path Integration for Transferable Neuron Attribution Attacks". 
+
+The full paper, including the complete supplementary materials, is available at [ttps://github.com/AdvML-Group/COPIA/blob/main/COPIA_Full.pdf](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Full.pdf).
 
 ## Introduction
 Transferable adversarial attacks pose significant security threats to
