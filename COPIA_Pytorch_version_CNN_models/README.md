@@ -20,7 +20,7 @@
 
 CNN models are all available in [timm](https://github.com/huggingface/pytorch-image-models) and torchvision library. 
 
-The dataset can be downloaded from the link https://github.com/jpzhang1810/NAA, which is provided by NAA's authors, and all the image files should be placed in the directory `. /NAA_images`.
+We used the same dataset as [NAA](https://github.com/jpzhang1810/NAA) and placed it in the './NAA_images'.
 
 To verify the transferability of adversarial examples, please use the verify.py script in the [NAA](https://github.com/jpzhang1810/NAA) code repository.
 
