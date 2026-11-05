@@ -54,7 +54,7 @@ If you find this work is useful in your research, please cite our paper:
 @InProceedings{MM26_COPIA,
     author    = {Ming, Di and Yang, Renqing and Liu, Yuanchengzhi and Ren, Peng and Zhou, Pengzhan and Wang, Yunlong and Feng, Xin},
     title     = {Counterfactual-Guided Diversified Path Integration for Transferable Neuron Attribution Attacks},
-    booktitle = {34th ACM International Conference on Multimedia (MM ’26)},
+    booktitle = {34th ACM International Conference on Multimedia (MM'26)},
     month     = {November},
     year      = {2026},
     pages     = {}
