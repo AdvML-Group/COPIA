@@ -1,7 +1,7 @@
 # COPIA
 
 The official implementation of
-[\[ACM MM 2026\] "Counterfactual-Guided Diversified Path Integration for Transferable Neuron Attribution Attacks", Di Ming, Renqing Yang, Yuanchengzhi Liu, Peng Ren, Pengzhan Zhou, Yunlong Wang, and Xin Feng*.]()
+[\[ACM MM 2026\] "Counterfactual-Guided Diversified Path Integration for Transferable Neuron Attribution Attacks", Di Ming, Renqing Yang, Yuanchengzhi Liu, Peng Ren, Pengzhan Zhou, Yunlong Wang, and Xin Feng*.](https://dl.acm.org/doi/10.1145/3767308.3835442)
 
 
 The full paper, including the complete **''Supplementary Materials''**, is available at [https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Full.pdf](https://github.com/AdvML-Group/COPIA/blob/main/COPIA_Full.pdf).
@@ -57,7 +57,7 @@ If you find this work is useful in your research, please cite our paper:
     booktitle = {34th ACM International Conference on Multimedia (MM'26)},
     month     = {November},
     year      = {2026},
-    pages     = {}
+    pages     = {7776-7785}
 }
 ```
 
